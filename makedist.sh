@@ -3,7 +3,7 @@
 name=sklearn-wrapper
 tmpdir=/tmp
 curdir=`pwd -P`
-version=`version.txt`
+version=`cat version.txt`
 destdir=$tmpdir/${name}$$
 curbranch=`git branch | grep '\*' | cut -c 3-`
 echo Making a release zip for $name, version $version from branch $curbranch
