@@ -1,3 +1,4 @@
+from __future__ import print_function
 import sys
 import sklearn as skl 
 import importlib
@@ -10,7 +11,7 @@ from sklearn.externals import joblib
 ## NOTE: some algorithms have the n_jobs attribute which can be used to enable 
 ## parallel processing!
 
-print "sklearnTrain - got args: ", sys.argv
+print("sklearnTrain - got args: ", sys.argv, file=sys.stderr)
 if len(sys.argv) < 4:
 	sys.exit("ERROR: Not at least four arguments: [script], data base name, model base name, algorithm name and options")
 
@@ -29,7 +30,8 @@ if not alg:
 options=sys.argv[4:]
 ## check that if there are options, they come in pairs!
 if len(options) % 2 != 0:
-	sys.exit("ERROR: need even number of name/value arguments for the options")
+        print("ERROR: need even number of name/value arguments for the options: got ",options,file=sys.stderr);
+	sys.exit("ERROR: sklearnTrain aborted")
 
 ## prepare the training algorithm
 ## NOTE: in Python 3 we should use functions from the imp module?
