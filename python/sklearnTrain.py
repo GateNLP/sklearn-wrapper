@@ -4,12 +4,16 @@ import sklearn as skl
 import importlib
 import scipy.io as sio
 from sklearn.externals import joblib
+import os
+import inspect
 
 ## IMPORTANT: the option values need to be valid pythong expressions, and they
 ## will get evaluated! So in order to pass a string, enclose the value in quotes!
 
 ## NOTE: some algorithms have the n_jobs attribute which can be used to enable 
 ## parallel processing!
+
+## NOTE: if a instweights.mtx file is present, the weights option of fit is used!
 
 print("sklearnTrain - got args: ", sys.argv, file=sys.stderr)
 if len(sys.argv) < 4:
@@ -61,10 +65,20 @@ for i in range(0, len(options), 2):
 ## The parameter is the prefix to which we add "dep.mtx" and "indep.mtx" to get the final names
 depfile = data+"dep.mtx"
 indepfile=data+"indep.mtx"
+weightsfile=data+"instweights.mtx"
+
 
 deps = sio.mmread(depfile)
 indeps = sio.mmread(indepfile)
+deps = deps.toarray().reshape(deps.shape[0],)
 
-model.fit(indeps,deps.toarray().reshape(deps.shape[0],))
+canWeights = "sample_weight" in inspect.getargspec(model.fit).args
+
+if canWeights and os.path.isfile(weightsfile):
+	weights = sio.mmread(weightsfile)
+	weights = weights.toarray().reshape(weights.shape[0],)
+	model.fit(indeps,deps,sample_weight=weights)
+else:	
+    model.fit(indeps,deps)
 
 joblib.dump(model,modelpath)

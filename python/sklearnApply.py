@@ -6,7 +6,7 @@ import json
 from scipy.sparse import csr_matrix
 import numpy as np
 
-## TODO make it work with regression!
+## TODO: make it work with regression!
 
 ##print ("sklearnApply - got args: ", sys.argv, file=sys.stderr)
 if len(sys.argv) != 2:
