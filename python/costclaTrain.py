@@ -6,8 +6,32 @@ import scipy.io as sio
 from sklearn.externals import joblib
 import os
 import inspect
+import numpy as np
+import pickle
 
-## IMPORTANT: the option values need to be valid pythong expressions, and they
+## IMPORTANT: costcla algorithms only support binary classification. This 
+## means that the cost matrix we get must contain two costs so the shape
+## of what we get must be (n,2)
+## However, the algorithm expects 4 values: from the full confusion matrix:
+## if the matrix is this:
+## 
+##             actual c0   actual c1
+##   pred c0      C-tn       c-fn
+##   pred c1      c-fp       c-tp
+##
+## Then for each instance the algorithm expects a vector 
+##    c-fp, c-fn, c-tp, c-tn  (according to private communication)
+##
+## We only get the two costs: assigning class 0 and assigning class 1: [c0, c1]
+## There are two cases:
+##    c0 < c1: true class is 0 so c0 is cTN and c1 is is cFP -- for this example,
+##          the true class is 0 so there is no TP -- not sure which cost to assign?
+##          same for FN: there is not FN so what is the cost?
+##    [c0, c1] => [c1, ?, ?, c0] => [c1, c1, c0, c0]
+##    else:  true class is 1 so c0 is cFN and c1 is cTP again the other two do not exist?
+##    [c0, c1] => [?, c0, c1, ?] => [c0, c0, c1, c1]
+
+## IMPORTANT: the option values need to be valid python expressions, and they
 ## will get evaluated! So in order to pass a string, enclose the value in quotes!
 
 ## NOTE: some algorithms have the n_jobs attribute which can be used to enable 
@@ -77,9 +101,25 @@ costsfile=data+"instcosts.mtx"
 
 deps = sio.mmread(depfile)
 indeps = sio.mmread(indepfile)
-deps = deps.toarray().reshape(deps.shape[0],)
 costs = sio.mmread(costsfile)
-costs = costs.toarray()
+
+deps = deps.toarray().reshape(deps.shape[0],)
+indeps = indeps.toarray()
+
+def conv1(x):
+    if(x[0]<x[1]):
+        return [x[1],x[1],x[0],x[0]]
+    else:
+        return [x[0],x[0],x[1],x[1]]
+
+def conv2(x):
+    if(x[0]<x[1]):
+        return [x[1],x[1],x[1],x[0]]
+    else:
+        return [x[0],x[0],x[0],x[1]]
+
+
+costs=np.array(map(conv1,costs.toarray()))
 
 canWeights = "sample_weight" in inspect.getargspec(model.fit).args
 
@@ -90,4 +130,7 @@ if canWeights and os.path.isfile(weightsfile):
 else:	
     model.fit(indeps,deps,cost_mat=costs)
 
-joblib.dump(model,modelpath)
+## joblib dump does not seem to work
+## joblib.dump(model,modelpath)
+
+pickle.dump(model,open(modelpath,'wb'))

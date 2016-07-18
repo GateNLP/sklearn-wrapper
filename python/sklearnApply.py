@@ -4,7 +4,6 @@ import sklearn as skl
 from sklearn.externals import joblib
 import json
 from scipy.sparse import csr_matrix
-import numpy as np
 
 ## TODO: make it work with regression!
 

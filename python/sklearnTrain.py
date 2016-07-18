@@ -6,6 +6,7 @@ import scipy.io as sio
 from sklearn.externals import joblib
 import os
 import inspect
+import numpy as np
 
 ## IMPORTANT: the option values need to be valid pythong expressions, and they
 ## will get evaluated! So in order to pass a string, enclose the value in quotes!

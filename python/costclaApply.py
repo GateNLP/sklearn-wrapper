@@ -5,6 +5,7 @@ from sklearn.externals import joblib
 import json
 from scipy.sparse import csr_matrix
 import numpy as np
+import pickle
 
 ## TODO: make it work with regression!
 
@@ -18,7 +19,8 @@ if not modelpath:
 
 
 ## get the model
-model=joblib.load(modelpath)
+## model=joblib.load(modelpath)
+model = pickle.load(open(modelpath,'rb'))
 model.probability=True
 canProbs = hasattr(model,"predict_proba") and callable(getattr(model,"predict_proba"))
 
