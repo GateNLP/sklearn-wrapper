@@ -12,5 +12,5 @@ shift
 pushd "$ROOTDIR" >/dev/null
 
 echo 1>&2 python "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
-python "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
+python3 "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
 popd >/dev/null
