@@ -24,7 +24,7 @@ print("Loaded the model: ",model,file=sys.stderr)
 model.probability=True
 canProbs = hasattr(model,"predict_proba") and callable(getattr(model,"predict_proba"))
 
-canProbs = False
+canProbs = True
 
 ## Now iterate through reading json from standard input
 ## We expect a map which either contains data to find predictions for or
@@ -64,7 +64,9 @@ while True:
 
 	ret = {}
 	ret["status"] = "OK"
-	print("DEBUG got X with shape: ",X.shape,file=sys.stderr)
+	X = X.toarray()
+	# print("DEBUG got X with shape: ",X.shape,file=sys.stderr)
+	# print("DEBUG X is of type: ",type(X),file=sys.stderr)
 	if canProbs:
 		probs = model.predict_proba(X)
 		targets = np.argmax(probs,axis=1).astype("float64")
