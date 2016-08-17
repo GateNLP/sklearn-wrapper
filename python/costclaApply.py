@@ -7,9 +7,8 @@ from scipy.sparse import csr_matrix
 import numpy as np
 import pickle
 
-## TODO: make it work with regression!
 
-##print ("sklearnApply - got args: ", sys.argv, file=sys.stderr)
+print ("costclaApply - got args: ", sys.argv, file=sys.stderr)
 if len(sys.argv) != 2:
 	sys.exit("ERROR: Not exactly two arguments: [script] and model path")
 
@@ -21,8 +20,11 @@ if not modelpath:
 ## get the model
 ## model=joblib.load(modelpath)
 model = pickle.load(open(modelpath,'rb'))
+print("Loaded the model: ",model,file=sys.stderr)
 model.probability=True
 canProbs = hasattr(model,"predict_proba") and callable(getattr(model,"predict_proba"))
+
+canProbs = False
 
 ## Now iterate through reading json from standard input
 ## We expect a map which either contains data to find predictions for or
@@ -62,6 +64,7 @@ while True:
 
 	ret = {}
 	ret["status"] = "OK"
+	print("DEBUG got X with shape: ",X.shape,file=sys.stderr)
 	if canProbs:
 		probs = model.predict_proba(X)
 		targets = np.argmax(probs,axis=1).astype("float64")

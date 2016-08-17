@@ -58,7 +58,7 @@ if not alg:
 options=sys.argv[4:]
 ## check that if there are options, they come in pairs!
 if len(options) % 2 != 0:
-        print("ERROR: need even number of name/value arguments for the options: got ",options,file=sys.stderr);
+	print("ERROR: need even number of name/value arguments for the options: got ",options,file=sys.stderr);
 	sys.exit("ERROR: sklearnTrain aborted")
 
 ## prepare the training algorithm
@@ -101,7 +101,9 @@ costsfile=data+"instcosts.mtx"
 
 deps = sio.mmread(depfile)
 indeps = sio.mmread(indepfile)
-costs = sio.mmread(costsfile)
+costs = sio.mmread(costsfile).toarray()
+print("Costs shape after reading: ",costs.shape, file=sys.stderr)
+print("Costs e0 after reading: ",costs[0], type(costs[0]), costs[0][0], file=sys.stderr)
 
 deps = deps.toarray().reshape(deps.shape[0],)
 indeps = indeps.toarray()
@@ -118,8 +120,10 @@ def conv2(x):
     else:
         return [x[0],x[0],x[0],x[1]]
 
-
-costs=np.array(map(conv1,costs.toarray()))
+tmp=list(map(conv1,costs))
+## print("tmp: ",tmp,file=sys.stderr)
+costs=np.array(tmp)
+print("Costs shape after conversion: ",costs.shape, file=sys.stderr)
 
 canWeights = "sample_weight" in inspect.getargspec(model.fit).args
 
@@ -127,8 +131,12 @@ if canWeights and os.path.isfile(weightsfile):
 	weights = sio.mmread(weightsfile)
 	weights = weights.toarray().reshape(weights.shape[0],)	
 	model.fit(indeps,deps,sample_weight=weights,cost_mat=costs)
-else:	
-    model.fit(indeps,deps,cost_mat=costs)
+else:
+	print("indeps shape: ",indeps.shape,file=sys.stderr)
+	print("deps shape: ",deps.shape,file=sys.stderr)
+	print("costs shape: ",costs.shape,file=sys.stderr)
+	print("Trying to fit model: ",model,file=sys.stderr)
+	model.fit(indeps,deps,cost_mat=costs)
 
 ## joblib dump does not seem to work
 ## joblib.dump(model,modelpath)
