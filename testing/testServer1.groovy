@@ -28,11 +28,13 @@ resp = Unirest.post("http://localhost:7000/").
   asString() 
 
 status = resp.getStatus()
-println("Got status"+status)
+println("Got status: "+status)
 
 if(status == 200) {
   body = resp.getBody()
   println("Got body, class="+body.getClass()+" obj="+body)
+} else {
+  println("Got error body: "+resp.getBody())
 }
 
 Unirest.post("http://localhost:7000/stop").asString()

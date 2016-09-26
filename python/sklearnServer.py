@@ -2,11 +2,13 @@ from __future__ import print_function
 import sys
 import sklearn as skl 
 from sklearn.externals import joblib
-import json
+from json import loads
+from json import dumps
 import numpy as np
 from flask import Flask
 from flask import request
 from flask import Response
+from scipy.sparse import csr_matrix
 
 
 ## First of all, check the arguments: we expect the model prefix and the server port number
@@ -57,13 +59,15 @@ def processGet():
 
 @app.route("/", methods=['POST'])
 def processPost():
-  ct=request.headers.get("Content-Type","UNKNOWN")
-  if ct is not "application/json":
+  ct=request.headers.get("Content-Type",request.headers.get("content-type","UNKNOWN")).strip().lower()
+  if ct != 'application/json':
+    print("ERROR: got request with content type: ",ct,file=sys.stderr)
     return errorResponse("ERROR: only application/json is accepted as content-type!\n")
   body=request.get_data()
   if not body:
+    print("ERROR: got request with no body",file=sys.stderr)
     return errorResponse("ERROR: got an empty request body, expected JSON string\n")
-  map = json.loads(body)
+  map = loads(body)
   ## we expect the same format as for weka: 
   ##   values: an array of double arrays with the sparse values
   ##   indices: an array of integer arrays with the sparse indices
@@ -85,14 +89,14 @@ def processPost():
   else:
   	targets = model.predict(X)
   	ret["probs"] = [[i] for i in targets]
-  json=json.dumps(ret)
-  resp=Response(string)
+  json=dumps(ret)
+  resp=Response(json)
   resp.status_code=200
   resp.headers["Content-type"] = "application/json"
   return resp
 
 ## Other servers can handle stop, we just cheerfully ignore it
-@app.route("/stop")
+@app.route("/stop",methods=['GET','POST'])
 def processStop():
   return "NO ERROR: stop command ignored, not supported\n"
 
