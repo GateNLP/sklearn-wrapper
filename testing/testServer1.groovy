@@ -19,6 +19,7 @@ ji = Json.array(indices)
 ji = Json.array().add(ji)
 json = Json.object().add("values",jv)
 json.add("indices",ji)
+json.add("n",values.size())
 println("json="+json)
 
 resp = Unirest.post("http://localhost:7000/").

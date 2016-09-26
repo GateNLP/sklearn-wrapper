@@ -37,7 +37,7 @@ def errorResponse(string):
   return resp
 
 ## Convert values/indices representation to csr_matrix representation
-def to_csr(values,indices):
+def to_csr(values,indices,ncols):
   csrinds = []
   csrvals = []
   csrptrs = [0]
@@ -49,7 +49,7 @@ def to_csr(values,indices):
       csrinds.append(inds[j])
       csrvals.append(vals[j])
     csrptrs.append(len(csrinds))
-  m=csr_matrix((csrvals,csrinds,csrptrs),dtype='float64')
+  m=csr_matrix((csrvals,csrinds,csrptrs),dtype='float64',shape=(ninst,ncols))
   return m
 
 ## We allow POST only, but we deal with GET explicitly
@@ -75,12 +75,18 @@ def processPost():
   values = map.get("values")
   indices = map.get("indices")
   weights = map.get("weights")
+  ## NOTE: it appears that some models complain if the shape of the matrix
+  ## does not reflect the correct number of sparse dimensions per instance, so
+  ## we need to use this when creating the sparse matrix!!
+  nrcols = map.get("n")
   if not values:
     return errorResponse("ERROR: got a JSON request without a values field\n")
+  ## if there are no indices, we take this as an indication that the values array is dense!
   if not indices:
-    return errorResponse("ERROR: got a JSON request without an indices field\n")
-  ## convert our own representation to a csr_matrix 
-  X=to_csr(values,indices)
+    X=csr_matrix(values)
+  else:
+    ## convert our own representation to a csr_matrix 
+    X=to_csr(values,indices,nrcols)
   ## Apply the model
   ret = {}
   if canProbs:
