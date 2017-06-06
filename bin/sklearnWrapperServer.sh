@@ -16,8 +16,9 @@ SCRIPTDIR=`dirname "$PRG"`
 SCRIPTDIR=`cd "$SCRIPTDIR"; pwd -P`
 ROOTDIR=`cd "$SCRIPTDIR/.."; pwd -P`
 
+mypython=${SKLEARN_WRAPPER_PYTHON:-python}
 
 pushd "$ROOTDIR" >/dev/null
 
-python "${ROOTDIR}/python/sklearnServer.py" $@
+${mypython} "${ROOTDIR}/python/sklearnServer.py" $@
 popd >/dev/null

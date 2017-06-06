@@ -9,8 +9,10 @@ shift
 algorithm="$1"
 shift
 
+mypython=${SKLEARN_WRAPPER_PYTHON:-python}
+
 pushd "$ROOTDIR" >/dev/null
 
-echo 1>&2 python3 "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
-python3 "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
+echo 1>&2 ${mypython} "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
+${mypython} "${ROOTDIR}/python/costclaTrain.py" "${data}" "${model}" "${algorithm}" $@
 popd >/dev/null
