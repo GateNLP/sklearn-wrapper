@@ -1,7 +1,6 @@
 #!/bin/bash
 
-ROOTDIR="$1"
-shift
+ROOTDIR="$SKLEARN_WRAPPER_HOME"
 model="$1"
 shift
 

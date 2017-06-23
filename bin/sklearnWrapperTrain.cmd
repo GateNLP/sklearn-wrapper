@@ -1,7 +1,6 @@
 @ECHO OFF
 
-SET ROOTDIR=%1
-shift
+SET ROOTDIR=%SKLEARN_WRAPPER_HOME%
 SET data=%1
 shift
 SET model=%1

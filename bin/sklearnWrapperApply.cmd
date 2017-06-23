@@ -1,9 +1,8 @@
 @ECHO OFF
 
 
-SET ROOTDIR=%1
-SET MODEL=%2
-shift
+SET ROOTDIR=%SKLEARN_WRAPPER_HOME%
+SET MODEL=%1
 shift
 
 : create var with remaining arguments
